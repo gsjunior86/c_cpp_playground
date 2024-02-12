@@ -11,11 +11,15 @@
 
 
 char board [board_size];
+char input = ' ';
+int cursor_pos = 0;
 
 void print_board(void);
 void fill_board(void);
 void start_position(void);
 void clearConsole(void);
+void kbread(void);
+void move_cursor(int new_pos);
 
 
 int main(int argc, char *argv[]){
@@ -23,18 +27,47 @@ int main(int argc, char *argv[]){
     float wait = (double) 1/fps;
     __uint8_t pos_started = 0;
 
-    char input = ' ';
+    
+
+    fill_board();
+    start_position();
+    print_board();
 
     while (1 && input != 'q'){
-        fill_board();
-        start_position();
         print_board();
         if(kbhit() == 1)
-            input = getchar();
-
+            kbread();
         sleep(wait);
         clearConsole();
     }
+}
+
+void kbread(){
+    input = getchar();
+
+    switch (input)
+    {
+    case 'w':
+        move_cursor(cursor_pos - b_w);
+        break;
+    case 'a':
+        move_cursor(cursor_pos - 1);
+        break;
+    case 's':
+        move_cursor(cursor_pos + b_w);
+        break;    
+    case 'd':
+        move_cursor(cursor_pos + 1);
+        break;                
+    default:
+        break;
+    }
+}
+
+void move_cursor(int new_pos){
+    board[cursor_pos] = ' ';
+    cursor_pos = new_pos;
+    board[cursor_pos] = '*';
 }
 
 void fill_board(void){
@@ -61,15 +94,14 @@ void print_board(void){
 }
 
 void start_position(){
-    int pos = 0;
     srand(time(NULL));
-    while(board[pos] == '#'){
-        pos =  rand() % ((board_size-1) - 0 + 1) + 0;
+    while(board[cursor_pos] == '#'){
+        cursor_pos =  rand() % ((board_size-1) - 0 + 1) + 0;
     }
 
     //printf("pos: %d \n", pos);
 
-    board[pos] = '*';
+    board[cursor_pos] = '*';
 }
 
 void clearConsole() {
